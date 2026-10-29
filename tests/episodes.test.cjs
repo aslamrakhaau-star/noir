@@ -1,0 +1,7 @@
+const assert=require('node:assert/strict');require('../dist/episodes.js');const E=globalThis.NoirEpisodes;
+const rows=E.normalize([{season:2,episode:1,name:'Return',description:'<b>A return</b>',runtime:42,released:'2021-02-02T10:00:00Z'},{season:0,episode:1,name:'Special'},{season:1,number:2,name:'Second'},{season:1,episode:1,name:'Pilot'},{season:1,episode:-1},{season:1,episode:2,name:'Second updated'}]);
+assert.deepEqual(rows.map(e=>[e.season,e.episode]),[[1,1],[1,2],[2,1]]);assert.equal(rows[1].name,'Second updated');assert.equal(rows[2].description,'A return');assert.equal(rows[2].date,'2021-02-02');assert.equal(rows[0].runtime,null);assert.equal(rows[2].runtime,42);
+assert.deepEqual(E.seasons(rows),[1,2]);assert.equal(E.adjacent(rows,1,1,-1),null);assert.equal(E.adjacent(rows,1,2,1).season,2);assert.equal(E.adjacent(rows,2,1,1),null);
+assert.equal(E.available({date:'2099-01-01'},Date.UTC(2026,9,26)),false);assert.equal(E.available({date:''}),true);
+const merged=E.merge(rows,E.normalize([{season:1,number:1,name:'Pilot',summary:'<p>Real synopsis</p>',runtime:33,airdate:'2020-08-14',image:{medium:'https://example.test/ep.jpg'}}],'tvmaze'));assert.equal(merged[0].runtime,33);assert.equal(merged[0].description,'Real synopsis');assert.equal(merged[0].image,'https://example.test/ep.jpg');assert.equal(merged.length,3);
+console.log('Episode ordering, season boundaries, unavailable episodes and metadata merging checks passed.');
